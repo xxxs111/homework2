@@ -9,6 +9,9 @@ dist/
 # 本地游戏存档（每台机器自己的进度，不该进仓库）
 arrow_arrows/progress.json
 
+# 本机用的推送辅助脚本，不属于作业内容
+/推送.bat
+
 # 编辑器 / 系统
 .idea/
 .vscode/
