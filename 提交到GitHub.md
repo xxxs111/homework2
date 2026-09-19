@@ -38,17 +38,22 @@ $env:Path += ";C:\Program Files\Git\cmd"
 git push -u origin main
 ```
 
-**如果推送被拒绝（`rejected ... non-fast-forward`）**：说明建仓库时勾选了 Add a README。
-两种处理方式，任选其一：
+**如果推送被拒绝（`! [rejected] main -> main (fetch first)`）**：说明建仓库时勾选了 Add a README，
+远程有一个本地没有的初始提交。`推送.bat` 已经内置处理：看到提示按 `y`，它就会用本地内容覆盖远程。
+
+手动处理的话，两种方式任选其一：
 
 ```powershell
-# 把远程那个 README 合并进来再推（推荐）
-& $git pull --rebase origin main
-& $git push -u origin main
-
-# 或者：远程只有自动生成的 README，直接用本地内容覆盖
+# 方式一：远程只有自动生成的 README，直接用本地内容覆盖（最简单）
 & $git push -u origin main --force
+
+# 方式二：不覆盖远程历史，把远程的初始提交合并进来（我们自己的 README 优先）
+& $git pull origin main --allow-unrelated-histories -X ours
+& $git push -u origin main
 ```
+
+> 这里**不建议**用 `git pull --rebase`：远程的 `README.md` 与本项目的 `README.md` 同名，
+> rebase 会在第一个提交就撞上 add/add 冲突；而且 rebase 过程中 `--ours / --theirs` 的含义是反的，容易搞混。
 
 远程地址要换的话：
 
