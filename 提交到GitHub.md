@@ -156,5 +156,49 @@ python -m unittest discover -s arrow_arrows/tests -t .
 ## 七、相关脚本
 
 * `推送.bat`：双击即可配置远程并推送（本机辅助脚本，不进仓库）。
+* `修复GitHub访问.bat` + `fix_github_hosts.ps1`：一键修复下面第八节的 hosts 问题（不进仓库）。
 * `tools/git_commits.ps1`：按模块重新生成这套提交历史（会自动寻找 `git.exe`，并写入中性署名）。
   仅在「需要重新整理历史」时使用；如果你之后按真实时间线提交，不要用它覆盖。
+
+---
+
+## 八、如果 push 报「连不上 github.com」
+
+按本机实际排查的结果：
+
+* `hosts` 文件里有 22 行把 github 相关域名（`github.com`、`api.github.com`、`raw.githubusercontent.com` 等）
+  指向了 `127.0.0.1`——多半是某个 GitHub 加速器 / 代理工具写进去的，这会让 **git 和浏览器都连不上 GitHub**；
+* 本机到 GitHub 的真实网络**其实是通的**（直连 `20.205.243.166:443` 测试成功），只是被 hosts 挡在了前面；
+* 本机装了 Clash Verge，但主程序没有运行，代理端口（7897）没有监听，系统代理也是关闭的。
+
+### 解法 A：修 hosts（推荐，不需要梯子）
+
+1. 双击 `修复GitHub访问.bat`；
+2. UAC 弹窗点「是」（改 hosts 需要管理员权限）；
+3. 它会先备份 hosts（`hosts.backup-<时间戳>`），再把那 22 行注释掉并刷新 DNS；
+4. 然后双击 `推送.bat` 推送即可。想恢复原样就用备份文件覆盖回去。
+
+等价的命令（在**管理员** PowerShell 里执行）：
+
+```powershell
+$p = "$env:SystemRoot\System32\drivers\etc\hosts"
+Copy-Item $p "$p.backup" -Force
+(Get-Content $p) | ForEach-Object {
+    if ($_ -match 'github' -and $_ -notmatch '^\s*#') { "#$_" } else { $_ }
+} | Set-Content $p -Encoding ASCII
+ipconfig /flushdns
+```
+
+### 解法 B：走代理（完全不动 hosts）
+
+```powershell
+# 1) 打开 Clash Verge，开启「系统代理」（混合端口默认 7897）
+# 2) 让 git 也走这个代理
+$git = "C:\Program Files\Git\cmd\git.exe"
+& $git config --global http.proxy  http://127.0.0.1:7897
+& $git config --global https.proxy http://127.0.0.1:7897
+
+# 3) 双击 推送.bat 推送；成功后可选择取消代理设置
+& $git config --global --unset http.proxy
+& $git config --global --unset https.proxy
+```
