@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+build/
+dist/
+*.spec
+
+# 本地游戏存档（每台机器自己的进度，不该进仓库）
+arrow_arrows/progress.json
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# 虚拟环境
+.venv/
+venv/
+env/
