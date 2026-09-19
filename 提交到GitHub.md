@@ -1,7 +1,13 @@
 # 提交到 GitHub
 
-> **当前状态：本地仓库已经建好了**（分支 `main`，9 次按模块划分的提交，工作区干净，已确认没有敏感信息）。
-> 剩下只有两步：**① 在 GitHub 网页新建空仓库；② 把本地提交推上去（需要你自己的 GitHub 账号授权）**。
+> **当前状态：本地仓库、远程地址都已经配好了**。
+> 分支 `main`，10 次按模块划分的提交，工作区干净，已确认没有敏感信息；
+> `origin` 已指向 `https://github.com/xxxs111/homework2.git`。
+> **只剩最后一步：在你自己的终端里执行一次 `git push`（需要你的 GitHub 账号授权）。**
+
+> 为什么最后这一步必须由你来做：推送要用你的 GitHub 账号，凭据只能由你本人授权；
+> 而且当前这台机器的命令行连不上外网（`git ls-remote` 报 `Could not connect to github.com:443`），
+> 所以推送只能在你自己能上网的终端里发起。
 
 ---
 
@@ -9,14 +15,12 @@
 
 项目根目录下有一个 `推送.bat`（本机辅助脚本，已加进 `.gitignore`，不会进仓库）：
 
-1. 先到 GitHub 网页新建一个**空仓库**（**不要**勾选 Add a README / .gitignore / license，否则推送会冲突）；
-2. 双击 `推送.bat`；
-3. 第一次运行时它会让你**粘贴仓库地址**（形如 `https://github.com/用户名/仓库名.git`）；
-4. 之后会弹出浏览器让你**登录 GitHub 授权**（Git 自带的 Credential Manager 负责，凭据只留在你本机，不会进仓库）；
-5. 看到 `[成功]` 就完成了，刷新仓库页面即可看到代码与 9 条提交记录。
+1. 双击 `推送.bat`；
+2. 第一次会弹出浏览器让你**登录 GitHub 授权**（Git 自带的 Credential Manager 负责，凭据只留在你本机，不会进仓库）；
+3. 看到 `[成功]` 就完成了，刷新 <https://github.com/xxxs111/homework2> 即可看到代码与 10 条提交记录。
 
-> 为什么最后一步需要你来做：推送要用你的 GitHub 账号，凭据必须由你本人授权；
-> 另外当前这台机器的命令行连不上外网（`github.com` 无法建立连接），所以推送只能在你自己的终端里发起。
+如果弹出的是「还没有配置远程仓库」，说明 remote 被清掉了，按提示粘贴
+`https://github.com/xxxs111/homework2.git` 即可。
 
 ---
 
@@ -27,20 +31,29 @@
 ```powershell
 # 方式 A：直接用完整路径
 $git = "C:\Program Files\Git\cmd\git.exe"
-& $git remote add origin https://github.com/<你的用户名>/<仓库名>.git
 & $git push -u origin main
 
 # 方式 B：把 git 加进当前会话的 PATH 后再用
 $env:Path += ";C:\Program Files\Git\cmd"
-git remote add origin https://github.com/<你的用户名>/<仓库名>.git
 git push -u origin main
 ```
 
-远程地址填错了就先删掉重来：
+**如果推送被拒绝（`rejected ... non-fast-forward`）**：说明建仓库时勾选了 Add a README。
+两种处理方式，任选其一：
 
 ```powershell
-& $git remote remove origin
-& $git remote add origin https://github.com/<你的用户名>/<仓库名>.git
+# 把远程那个 README 合并进来再推（推荐）
+& $git pull --rebase origin main
+& $git push -u origin main
+
+# 或者：远程只有自动生成的 README，直接用本地内容覆盖
+& $git push -u origin main --force
+```
+
+远程地址要换的话：
+
+```powershell
+& $git remote set-url origin https://github.com/<你的用户名>/<仓库名>.git
 ```
 
 ---
@@ -49,14 +62,16 @@ git push -u origin main
 
 ```
 分支：main
-提交：9 条（按模块划分）
+提交：10 条（按模块划分）
 文件：40 个（源码 + 测试 + 工具 + 12 张界面截图 + 4 份文档）
 大小：约 0.84 MB
+远程：origin -> https://github.com/xxxs111/homework2.git
 ```
 
 提交历史：
 
 ```
+docs: 补充本地仓库状态与一键推送说明
 docs: 完善 README、实验报告与博客
 chore: 添加无头截图与逐关试玩验证脚本
 test: 补充规则、界面集成与作业测试表 T01-T06 用例
